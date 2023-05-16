@@ -1,0 +1,143 @@
+{
+    "channel":
+    [
+        {
+            "name": "UNICLUSTER_CHL",
+            "connectionManagement":
+            {
+              "heartbeatInterval": 30
+            },
+            "clientConnection":
+            {
+                "connection":
+                [
+                    {
+                        "host": "ucqm1-ibm-mq-qm-cp4i.$ROOTURL",
+                        "port": 443
+                    }
+                ],
+                "queueManager": "ANY_QM"
+            },
+            "transmissionSecurity":
+            {
+              "cipherSpecification": "ANY_TLS12_OR_HIGHER"
+            },
+            "type": "clientConnection"
+        },
+        {
+            "name": "UNICLUSTER_CHL",
+            "connectionManagement":
+            {
+              "heartbeatInterval": 30
+            },
+            "clientConnection":
+            {
+                "connection":
+                [
+                    {
+                        "host": "ucqm2-ibm-mq-qm-cp4i.$ROOTURL",
+                        "port": 443
+                    }
+                ],
+                "queueManager": "ANY_QM"
+            },
+            "transmissionSecurity":
+            {
+              "cipherSpecification": "ANY_TLS12_OR_HIGHER"
+            },
+            "type": "clientConnection"
+        },
+        {
+            "name": "UNICLUSTER_CHL",
+            "connectionManagement":
+            {
+              "heartbeatInterval": 30
+            },
+            "clientConnection":
+            {
+                "connection":
+                [
+                    {
+                        "host": "ucqm3-ibm-mq-qm-cp4i.$ROOTURL",
+                        "port": 443
+                    }
+                ],
+                "queueManager": "ANY_QM"
+            },
+            "transmissionSecurity":
+            {
+              "cipherSpecification": "ANY_TLS12_OR_HIGHER"
+            },
+            "type": "clientConnection"
+        },
+        {
+            "name": "UNICLUSTER_CHL",
+            "connectionManagement":
+            {
+              "heartbeatInterval": 30
+            },
+            "clientConnection":
+            {
+                "connection":
+                [
+                    {
+                        "host": "ucqm1-ibm-mq-qm-cp4i.$ROOTURL",
+                        "port": 443
+                    }
+                ],
+                "queueManager": "ucqm1"
+            },
+            "transmissionSecurity":
+            {
+              "cipherSpecification": "ANY_TLS12_OR_HIGHER"
+            },
+            "type": "clientConnection"
+        },
+        {
+            "name": "UNICLUSTER_CHL",
+            "connectionManagement":
+            {
+              "heartbeatInterval": 30
+            },
+            "clientConnection":
+            {
+                "connection":
+                [
+                    {
+                        "host": "ucqm2-ibm-mq-qm-cp4i.$ROOTURL",
+                        "port": 443
+                    }
+                ],
+                "queueManager": "ucqm2"
+            },
+            "transmissionSecurity":
+            {
+              "cipherSpecification": "ANY_TLS12_OR_HIGHER"
+            },
+            "type": "clientConnection"
+        },
+        {
+            "name": "UNICLUSTER_CHL",
+            "connectionManagement":
+            {
+              "heartbeatInterval": 30
+            },
+            "clientConnection":
+            {
+                "connection":
+                [
+                    {
+                        "host": "ucqm3-ibm-mq-qm-cp4i.$ROOTURL",
+                        "port": 443
+                    }
+                ],
+                "queueManager": "ucqm3"
+            },
+            "transmissionSecurity":
+            {
+              "cipherSpecification": "ANY_TLS12_OR_HIGHER"
+            },
+            "type": "clientConnection"
+        }
+   ]
+}
