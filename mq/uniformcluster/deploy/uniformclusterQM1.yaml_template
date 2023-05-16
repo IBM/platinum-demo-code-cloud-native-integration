@@ -17,7 +17,7 @@ metadata:
   name: ucqm1
   namespace: $TARGET_NAMESPACE
 spec:
-  version: 9.3.0.0-r1
+  version: 9.3.1.0-r1
   license:
     accept: true
     license: L-RJON-CD3JKX
