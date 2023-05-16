@@ -1,0 +1,171 @@
+# © Copyright IBM Corporation 2023
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: environment-setup-pipeline
+spec:
+  params:
+    - name: imageTag
+      type: string
+      description: The image tag
+    - name: namespace
+      type: string
+      default: main
+      description: The phase of this pipeline, initial, scale, upgrade, etc
+  workspaces:
+    - name: git-source
+  tasks:
+    - name: clone-git-source
+      retries: 0
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: "https://github.com/IBM/platinum-demo-code-cloud-native-integration.git"
+        - name: subdirectory
+          value: ""
+        - name: deleteExisting
+          value: "true"
+        - name: revision
+          value: "main"
+      workspaces:
+        - name: output
+          workspace: git-source
+
+    # Deploy operators
+#    - name: deploy-operators
+#      retries: 0
+#      runAfter:
+#        - clone-git-source
+#      taskRef:
+#        name: run-script
+#      params:
+#        - name: script
+#          value: "setup/deploy.sh"
+#        - name: params
+#          value: " $(params.namespace)"
+#      workspaces:
+#        - name: git-source
+#          workspace: git-source
+    
+    # Deploy pipelines
+    - name: deploy-pipelines
+      retries: 0
+      runAfter:
+#        - deploy-operators
+        - clone-git-source
+      taskRef:
+        name: run-script
+      params:
+        - name: script
+          value: "pipeline/installPipeline.sh"
+        - name: params
+          value: " $(params.namespace)"
+      workspaces:
+        - name: git-source
+          workspace: git-source
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: run-script
+spec:
+  params:
+    - name: script
+      type: string
+      description: The full path to the script relative to the git workspace
+    - name: params
+      type: string
+      description: The parameters to pass to the script when calling
+  workspaces:
+    - name: git-source
+  steps:
+    - name: oc
+      image: quay.io/openshift/origin-cli:latest
+      script: "/workspace/git-source/$(params.script) $(params.params)"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: environment-setup-pipeline-triggertemplate
+spec:
+  params:
+    - name: namespace
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: environment-setuprun-$(uid)
+      spec:
+        pipelineRef:
+          name: environment-setup-pipeline
+        serviceAccountName: pipeline-admin
+        podTemplate:
+          securityContext:
+            runAsUser: 0
+            fsGroup: 65532
+            supplementalGroups:
+              - 65531
+              - 65534
+        workspaces:
+          - name: git-source
+            persistentvolumeclaim:
+              claimName: git-source-workspace
+        params:
+          - name: imageTag
+            value: $(uid)
+          - name: namespace
+            value: $(tt.params.namespace)
+        timeout: "20m"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: environment-setup-pipeline-triggerbinding
+spec:
+  params:
+  - name: namespace
+    value: $(body.namespace)
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: environment-setup-pipeline-event-listener
+spec:
+  serviceAccountName: pipeline-admin
+  triggers:
+    - name: environment-setup-pipeline-trigger
+      bindings:
+        - ref: environment-setup-pipeline-triggerbinding
+      template:
+        ref: environment-setup-pipeline-triggertemplate
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: EventListener
+    app.kubernetes.io/part-of: Triggers
+    eventlistener: environment-setup-pipeline-event-listener
+  name: el-environment-setup-pipeline-trigger-route
+spec:
+  host: ""
+  port:
+    targetPort: http-listener
+  to:
+    kind: Service
+    name: el-environment-setup-pipeline-event-listener
+    weight: null

@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<!--
+© Copyright IBM Corporation 2022
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+	  	<link rel="stylesheet"
+	        href="https://1.www.s81c.com/common/carbon-for-ibm-dotcom/tag/v1/canary/plex.css"/>
+	  	<link rel="stylesheet"
+	        href="https://1.www.s81c.com/common/carbon-for-ibm-dotcom/tag/v1/canary/grid.css"/>
+	 	 <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/modal.min.js"></script>
+	  
+	  	<script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/ui-shell.min.js"></script>
+	
+	  	<style>
+	    h3 {
+	      margin-bottom: 1rem;
+	    }
+		</style>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    </head>
+	<body>
+		<bx-header aria-label="IBM Platform Name">
+		<bx-header-menu-button button-label-active="Close menu" button-label-inactive="Open menu"></bx-header-menu-button>
+		<bx-header-name href="javascript:void 0" prefix="IBM"> Platinum Demo</bx-header-name>
+		<bx-header-nav menu-bar-label="IBM [Platform]">
+		    <bx-header-nav-item href="javascript:void 0">Monitor</bx-header-nav-item>
+		    <bx-header-nav-item href="javascript:void 0">Control</bx-header-nav-item>
+		</bx-header-nav>
+		</bx-header>
+		<div class="bx--grid">
+		  <div>
+		    <div style="margin-top:60px;">
+		      <h3>Building and scaling a mission critical cloud native integration</h3>
+			</div>
+			<div>
+				<hr style="margin: 1rem 0" />
+				<div style="float: left; width: 10%;">
+				<text>Mobile App</text>
+				<br>
+				<bx-btn onclick="scaleMobile()" style="margin-top: 8px; width: 100px">
+        			Requests+
+      			</bx-btn>
+      			<bx-btn onclick="shrinkMobile()" style="margin-top: 8px; width: 100px">
+        			Requests-
+      			</bx-btn>
+				<bx-btn onclick="scale()" style="margin-top: 8px; width: 100px">
+        			Scale
+      			</bx-btn>
+				</div>
+				<div style="float: left; width: 10%;"></div>
+			    <div style="float: left; width: 90%;margin-bottom: 16px;">
+			    	<div style="float: left; width: 25%;">
+			    	</div>
+			    	<div style="float: center; width: 25%;">
+			    	<canvas id="inbound-chart" width="400" height="225"></canvas>
+			    	</div>
+			    </div>
+		    </div>
+		    <div>
+			    <hr style="margin: 1rem 0" />
+				<div style="float: left; width: 10%;">
+				<text>ACE</text>
+				<br>
+				<!--bx-btn onclick="scaleCPUInfinite()" style="margin-top: 8px; width: 100px">
+        			CPU+
+      			</bx-btn-->
+				<!--bx-btn onclick="scaleInfinite()" style="margin-top: 8px; width: 100px">
+        			Scale
+      			</bx-btn-->
+      			<!--bx-btn onclick="shrinkInfinite()" style="margin-top: 8px; width: 100px">
+        			Instances-
+      			</bx-btn-->
+				</div>
+				<div style="float: left; width: 90%;margin-bottom: 16px;">
+			    	<div style="float: left; width: 25%;">
+			    		<canvas id="integration1-chart" width="400" height="225"></canvas>
+			    		<center id="integration1-name">Integration Server 1</center>
+			    	</div>
+		        	<div style="float: left; width: 25%;">
+						<canvas id="integration2-chart" width="400" height="225"></canvas>
+						<center id="integration2-name">Integration Server 2</center>
+					</div>
+					<div style="float: left; width: 25%;">
+						<canvas id="integration3-chart" width="400" height="225"></canvas>
+						<center id="integration3-name">Integration Server 3</center>
+					</div>
+					<div style="float: left; width: 25%;" hidden=true>
+						<canvas id="integration4-chart" width="400" height="225"></canvas>
+						<center id="integration4-name">Integration Server 4</center>
+					</div>
+				</div>
+		    </div>
+		    <div>
+			    <hr style="margin: 1rem 0" />
+				<div style="float: left; width: 10%;">MQ<br>
+				<!--bx-btn onclick="scaleCPUMQ()" style="margin-top: 8px; width: 100px">
+        			CPU+
+      			</bx-btn-->
+      			<!--bx-btn onclick="scaleMQ()" style="margin-top: 8px; width: 100px">
+        			Scale
+      			<--/bx-btn>
+      			<!--bx-btn onclick="shrinkMQ()" style="margin-top: 8px; width: 100px">
+        			Instances-
+      			</bx-btn-->
+				<!--bx-btn onclick="upgradeMQ()" style="margin-top: 8px; width: 100px">
+        			Upgrade
+      			</bx-btn-->
+			    </div>
+				<div style="float: left; width: 90%;margin-bottom: 16px;">
+			    	<div style="float: left; width: 25%;">
+			    		<canvas id="mq1-chart" width="400" height="225"></canvas>
+			    		<center id="mq1-name">Queue Manager 1</center>
+			    	</div>
+		        	<div style="float: left; width: 25%;">
+						<canvas id="mq2-chart" width="400" height="225"></canvas>
+						<center id="mq2-name">Queue Manager 2</center>
+					</div>
+					
+		        	<div style="float: left; width: 25%;" hidden=true>
+						<canvas id="mq3-chart" width="400" height="225"></canvas>
+						<center id="mq3-name">Queue Manager 3</center>
+					</div>
+				</div>
+		    </div>
+		    <div>
+			    <hr style="margin: 1rem 0" />
+				<div style="float: left; width: 10%;">Core Banking
+				<br>
+				<!-- bx-btn onclick="scaleCPUCore()" style="margin-top: 8px; width: 100px">
+        			CPU+
+      			</bx-btn>
+				<bx-btn onclick="scaleCore()" style="margin-top: 8px; width: 100px">
+        			Instances+
+      			</bx-btn>
+      			<bx-btn onclick="shrinkCore()" style="margin-top: 8px; width: 100px">
+        			Instances-
+      			</bx-btn -->
+				</div>
+				<div style="float: left; width: 90%;margin-bottom: 16px">
+			    	<div style="float: left; width: 25%;">
+			    		<canvas id="corebanking1-chart" width="400" height="225"></canvas>
+			    		<center id="corebanking1-name">Server 1</center>
+			    	</div>
+		        	<div style="float: left; width: 25%;">
+						<canvas id="corebanking2-chart" width="400" height="225"></canvas>
+						<center id="corebanking2-name">Server 2</center>
+					</div>
+					<div style="float: left; width: 25%;">
+						<canvas id="corebanking3-chart" width="400" height="225"></canvas>
+						<center id="corebanking3-name">Server 3</center>
+					</div>
+					<div style="float: left; width: 25%;" hidden=true>
+						<canvas id="corebanking4-chart" width="400" height="225"></canvas>
+						<center id="corebanking4-name">Server 4</center>
+					</div>
+				</div>
+		    </div>
+			<div>
+			    <hr style="margin: 1rem 0" />
+				<div style="float: left; width: 10%;">Notification Service
+				<br>
+				<bx-btn onclick="deployNewRelease()" style="margin-top: 8px; width: 100px">
+        			Deploy
+      			</bx-btn>
+				</div>
+				<div style="float: left; width: 90%;margin-bottom: 16px">
+			    	<div style="float: left; width: 25%;">
+			    		<canvas id="notification1-chart" width="400" height="225"></canvas>
+			    		<center id="notification1-name">Notification Service</center>
+					</div>
+				</div>
+		    </div>
+		  </div>
+		</div>
+		
+		<script>
+		const integrationServerMap = new Map();
+		const mqMap = new Map();
+		const coreServerMap = new Map();
+		const inboundCtx = document.getElementById('inbound-chart').getContext('2d');
+		const integration1Ctx = document.getElementById('integration1-chart').getContext('2d');
+		const integration2Ctx = document.getElementById('integration2-chart').getContext('2d');
+		const integration3Ctx = document.getElementById('integration3-chart').getContext('2d');
+		const integration4Ctx = document.getElementById('integration4-chart').getContext('2d');
+		const mq1Ctx = document.getElementById('mq1-chart').getContext('2d');
+		const mq2Ctx = document.getElementById('mq2-chart').getContext('2d');
+		const mq3Ctx = document.getElementById('mq3-chart').getContext('2d');
+		const core1Ctx = document.getElementById('corebanking1-chart').getContext('2d');
+		const core2Ctx = document.getElementById('corebanking2-chart').getContext('2d');
+		const core3Ctx = document.getElementById('corebanking3-chart').getContext('2d');
+		const core4Ctx = document.getElementById('corebanking4-chart').getContext('2d');
+		const notification1Ctx = document.getElementById('notification1-chart').getContext('2d');
+		
+		const DATA_COUNT = 10;
+		const labels = [];
+		for (let i = 0; i < DATA_COUNT; ++i) {
+		  labels.push(i.toString());
+		}
+		
+		const inboundDatapoints = [0];
+		const integration1Datapoints = [0];
+		const integration2Datapoints = [0];
+		const integration3Datapoints = [0];
+		const integration4Datapoints = [0];
+		const mq1Datapoints = [0];
+		const mq2Datapoints = [0];
+		const mq3Datapoints = [0];
+		const core1Datapoints = [0];
+		const core2Datapoints = [0];
+		const core3Datapoints = [0];
+		const core4Datapoints = [0];
+		const notification1Datapoints = [0];
+		
+		const inboundData = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: 'Something',
+			  data: inboundDatapoints,
+			  borderColor: 'rgb(255, 99, 132)',
+			  fill: true,
+			  backgroundColor: [
+          		"#FFD6D4"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		Chart.defaults.plugins.legend.display=false;
+		
+		const integration1Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: integration1Datapoints,
+			  borderColor: 'rgb(31, 148, 7)',
+			  fill: true,
+			  backgroundColor: [
+          		"#C9FF94"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		
+		const integration2Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: integration2Datapoints,
+			  borderColor: 'rgb(31, 148, 7)',
+			  fill: true,
+			  backgroundColor: [
+          		"#C9FF94"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		const integration3Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: integration3Datapoints,
+			  borderColor: 'rgb(31, 148, 7)',
+			  fill: true,
+			  backgroundColor: [
+          		"#C9FF94"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		const integration4Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: integration4Datapoints,
+			  borderColor: 'rgb(31, 148, 7)',
+			  fill: true,
+			  backgroundColor: [
+          		"#C9FF94"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		const mq1Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: mq1Datapoints,
+			  borderColor: 'rgb(0, 35, 245)',
+			  fill: true,
+			  backgroundColor: [
+          		"#9B97FF"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		
+		const mq2Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: mq2Datapoints,
+			  borderColor: 'rgb(0, 35, 245)',
+			  fill: true,
+			  backgroundColor: [
+          		"#9B97FF"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		const mq3Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: mq3Datapoints,
+			  borderColor: 'rgb(0, 35, 245)',
+			  fill: true,
+			  backgroundColor: [
+          		"#9B97FF"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		const core1Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: core1Datapoints,
+			  borderColor: 'rgb(116, 27,124)',
+			  fill: true,
+			  backgroundColor: [
+          		"#F58EFF"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		
+		const core2Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: core2Datapoints,
+			  borderColor: 'rgb(116, 27,124)',
+			  fill: true,
+			  backgroundColor: [
+          		"#F58EFF"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		const core3Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: core3Datapoints,
+			  borderColor: 'rgb(116, 27,124)',
+			  fill: true,
+			  backgroundColor: [
+          		"#F58EFF"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		const core4Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: core4Datapoints,
+			  borderColor: 'rgb(116, 27,124)',
+			  fill: true,
+			  backgroundColor: [
+          		"#F58EFF"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+
+		const notification1Data = {
+		  labels: labels,
+		  datasets: [
+			{
+			  label: '',
+			  data: notification1Datapoints,
+			  borderColor: 'rgb(116, 27,124)',
+			  fill: true,
+			  backgroundColor: [
+          		"#F58EFF"
+          		],
+			  cubicInterpolationMode: 'monotone',
+			  tension: 0.4
+			}
+		  ]
+		};
+		
+		const integration1Chart = new Chart(integration1Ctx, {
+			type: 'line',
+			data: integration1Data,
+			options: {
+			    scales: {
+					y: {
+						beginAtZero: true,
+						max: 200
+					}
+				}
+			}
+		});
+		
+		const integration2Chart = new Chart(integration2Ctx, {
+			type: 'line',
+			data: integration2Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 200
+					}
+				}
+			}
+		});
+		
+		const integration3Chart = new Chart(integration3Ctx, {
+			type: 'line',
+			data: integration3Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 200
+					}
+				}
+			}
+		});
+		
+		const integration4Chart = new Chart(integration4Ctx, {
+			type: 'line',
+			data: integration4Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 200
+					}
+				}
+			}
+		});
+		
+		const mq1Chart = new Chart(mq1Ctx, {
+			type: 'line',
+			data: mq1Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 300
+					}
+				}
+			}
+		});
+		
+		const mq2Chart = new Chart(mq2Ctx, {
+			type: 'line',
+			data: mq2Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 300
+					}
+				}
+			}
+		});
+		
+		const mq3Chart = new Chart(mq3Ctx, {
+			type: 'line',
+			data: mq3Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 300
+					}
+				}
+			}
+		});
+		
+		const inboundChart = new Chart(inboundCtx, {
+			type: 'line',
+			data: inboundData,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 300
+					}
+				}
+			}
+		});
+		
+		const core1Chart = new Chart(core1Ctx, {
+			type: 'line',
+			data: core1Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 200
+					}
+				}
+			}
+		});
+		
+		const core2Chart = new Chart(core2Ctx, {
+			type: 'line',
+			data: core2Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 200
+					}
+				}
+			}
+		});
+		
+		const core3Chart = new Chart(core3Ctx, {
+			type: 'line',
+			data: core3Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 200
+					}
+				}
+			}
+		});
+		
+		const core4Chart = new Chart(core4Ctx, {
+			type: 'line',
+			data: core4Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 200
+					}
+				}
+			}
+		});
+		
+		const notification1Chart = new Chart(notification1Ctx, {
+			type: 'line',
+			data: notification1Data,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						max: 400
+					}
+				}
+			}
+		});
+
+		setInterval(getData, 5000)
+		
+		function mapServersToGraph(mappingData){
+			
+			findCharts(mappingData.integrationServers, integrationServerMap, "integration1-name", "integration2-name", "integration3-name", "integration4-name", integration1Chart, integration2Chart, integration3Chart, integration4Chart);
+			
+			findCharts(mappingData.queueManagers, mqMap, "mq1-name", "mq2-name", "mq3-name", null, mq1Chart, mq2Chart, mq3Chart, null);
+			fixupVersions(mappingData.queueManagers, "mq1-name", "mq2-name", "mq3-name", null);
+			findCharts(mappingData.echoServer, coreServerMap, "corebanking1-name", "corebanking2-name", "corebanking3-name", "corebanking4-name", core1Chart, core2Chart, core3Chart, core4Chart);
+			
+		}
+		
+		function fixupVersions(listOfServers, label1, label2, label3, label4){
+			var qmgrExistingLabel1 = document.getElementById(label1).textContent;
+			var qmgrName1 = qmgrExistingLabel1.split(" ")[0];
+			var qmgrForLabel1 = listOfServers.find(item => item.name === qmgrName1);
+			console.log("qmgrForLabel1.name="+qmgrForLabel1.name + " qmgrForLabel1.version="+qmgrForLabel1.version)
+		    if(qmgrForLabel1 != null)
+			{
+				document.getElementById(label1).textContent = qmgrName1 + "     v"+qmgrForLabel1.version;
+			}
+
+			var qmgrExistingLabel2 = document.getElementById(label2).textContent;
+			var qmgrName2 = qmgrExistingLabel2.split(" ")[0];
+			var qmgrForLabel2 = listOfServers.find(item => item.name === qmgrName2);
+			console.log("qmgrForLabel2.name="+qmgrForLabel2.name + " qmgrForLabel2.version="+qmgrForLabel2.version)
+		    if(qmgrForLabel2 != null)
+			{
+				document.getElementById(label2).textContent = qmgrName2 + "     v"+ qmgrForLabel2.version;
+			}
+
+			var qmgrExistingLabel3 = document.getElementById(label3).textContent;
+			var qmgrName3 = qmgrExistingLabel3.split(" ")[0];
+			var qmgrForLabel3 = listOfServers.find(item => item.name === qmgrName3);
+		    if(qmgrForLabel3 != null)
+			{
+				document.getElementById(label3).textContent = qmgrName3 + "     v"+ qmgrForLabel3.version;
+			}
+
+		}
+
+		function findCharts(listOfServers, serverMap, label1, label2, label3, label4, chart1, chart2, chart3, chart4){
+			const foundServerMap = new Map();
+			const notFoundServerList = [];  
+			
+			for (const server of listOfServers) { 
+				console.log(server.name); 
+				if(!serverMap.has(server.name)){
+				  notFoundServerList.push(server.name);
+				  console.log("found new server");
+				}
+				else{
+				  foundServerMap.set(serverMap.get(server.name), server.name);
+				}
+			}
+			assignCharts(notFoundServerList, foundServerMap, label1, label2, label3, label4, chart1, chart2, chart3, chart4, serverMap);
+			
+		}
+		
+		function assignCharts(notFoundList, foundMap, label1, label2, label3, label4, chart1, chart2, chart3, chart4, finalMap){
+			if(notFoundList.length >0)
+			{
+				if(!foundMap.has(chart1))
+				{
+					const serverToAdd = notFoundList.pop();
+					foundMap.set(chart1, serverToAdd);
+					document.getElementById(label1).textContent=serverToAdd;
+				}
+				if(notFoundList.length >0 && !foundMap.has(chart2))
+				{
+					const serverToAdd = notFoundList.pop();
+					foundMap.set(chart2, serverToAdd);
+					document.getElementById(label2).textContent=serverToAdd;
+				}
+				if(notFoundList.length >0 && !foundMap.has(chart3))
+				{
+					const serverToAdd = notFoundList.pop();
+					foundMap.set(chart3, serverToAdd);
+					document.getElementById(label3).textContent=serverToAdd;
+				}
+				if(notFoundList.length >0 && !foundMap.has(chart4))
+				{
+					const serverToAdd = notFoundList.pop();
+					foundMap.set(chart4, serverToAdd);
+					document.getElementById(label4).textContent=serverToAdd;
+				}
+				if(foundMap.size > 2){
+					finalMap.clear();
+				}
+				foundMap.forEach(function(value, key, map){finalMap.set(value,key)});
+				console.log(finalMap);
+				
+				if(finalMap.size <4){
+					if(label4  != null)
+					{
+						document.getElementById(label4).parentElement.hidden=true;
+					}
+				}
+				
+				if(finalMap.size ==3){
+					if((label3  != null))
+					{
+						document.getElementById(label3).parentElement.hidden=false;
+					}
+				}
+				
+				if(finalMap.size ==2){
+					if((label4  == null) && (label3  != null))
+					{
+						document.getElementById(label3).parentElement.hidden=true;
+					}
+				}
+				
+				if(finalMap.size ==4){
+					if((label4  != null))
+					{
+						document.getElementById(label4).parentElement.hidden=false;
+					}
+				}
+				
+			}
+		}
+		
+		function updateChartData(currentChart, throughput){
+			var chartDataPoints = currentChart.data.datasets[0].data.length;
+			if(chartDataPoints > 9) {
+				removeData(currentChart);
+			}
+			
+			if (typeof throughput !== 'undefined')	
+			{
+				addData(currentChart, "", throughput);
+			}
+			else
+			{
+				addData(currentChart, "", 0);
+			}
+		}
+		
+		function updateChart(jsonResponse){
+			console.log(integrationServerMap.size);
+			integrationServerMap.forEach(function(value, key, map){
+				console.log("loop for charts");
+				console.log(key)
+				const result = jsonResponse.integrationServers.filter(server => server.name==key);
+				if(result.length>0){
+					updateChartData(value, result[0].requests);
+				}
+				else {
+					updateChartData(value, 0);
+				}
+			});
+			
+			mqMap.forEach(function(value, key, map){
+				console.log("loop for charts");
+				console.log(key)
+				const result = jsonResponse.queueManagers.filter(server => server.name==key);
+				if(result.length>0){
+					updateChartData(value, result[0].requests);
+				}
+				else {
+					updateChartData(value, 0);
+				}
+			});
+			
+			coreServerMap.forEach(function(value, key, map){
+				console.log("loop for charts");
+				console.log(key)
+				const result = jsonResponse.echoServer.filter(server => server.name==key);
+				if(result.length>0){
+					updateChartData(value, result[0].requests);
+				}
+				else {
+					updateChartData(value, 0);
+				}
+			});
+			
+            if(jsonResponse.notificationCalls != null){
+				updateChartData(notification1Chart, jsonResponse.notificationCalls);
+			}
+
+			updateChartData(inboundChart, jsonResponse.totalRequests);
+		}
+		
+		function getData(){
+			const xhr = new XMLHttpRequest();
+			xhr.open("GET", "../rest", true);
+			xhr.onload = (e) => {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var jsonResponse = JSON.parse(xhr.responseText);
+					console.log(jsonResponse);
+					
+					mapServersToGraph(jsonResponse);
+					
+					updateChart(jsonResponse);
+					
+					inboundChart.update();
+					integration1Chart.update();
+					integration2Chart.update();
+					integration3Chart.update();
+					integration4Chart.update();
+					core1Chart.update();
+					core2Chart.update();
+					core3Chart.update();
+					core4Chart.update();
+					mq1Chart.update();
+					mq2Chart.update();
+					mq3Chart.update();
+					notification1Chart.update();
+				} else {
+					console.error(xhr.statusText);
+				}
+			}
+			};
+
+			xhr.onerror = (e) => {
+				console.error(xhr.statusText);
+			};
+			xhr.send(null);
+		}
+		
+		function scaleMobile(){
+			const xhr = new XMLHttpRequest();
+			xhr.open("GET", "../scale-mobile-app", true);
+			xhr.send(null);
+			inboundChart.options.scales.y.max = 400;			
+		}
+
+		function deployNewRelease(){
+			const xhr = new XMLHttpRequest();
+			xhr.open("GET", "../deploy_new_release", true);
+			xhr.send(null);
+		}
+		
+		function shrinkMobile(){
+			const xhr = new XMLHttpRequest();
+			xhr.open("GET", "../shrink-mobile-app", true);
+			xhr.send(null);
+			inboundChart.options.scales.y.max = 300;			
+		}
+
+			
+		function scaleInfinite(){
+			const xhr = new XMLHttpRequest();
+			xhr.open("GET", "../scale-infinite", true);
+			xhr.send(null);
+		}
+		
+		function scale(){
+			const xhr = new XMLHttpRequest();
+			xhr.open("GET", "../scale", true);
+			xhr.send(null);
+		}
+		
+		function upgradeMQ(){
+			const xhr = new XMLHttpRequest();
+			xhr.open("GET", "../upgrade-mq", true);
+			xhr.send(null);
+		}
+
+		function addData(chart, label, data) {
+    		//chart.data.labels.push(label);
+    		chart.data.datasets.forEach((dataset) => {
+        	dataset.data.push(data);
+    	});
+    	}
+    	
+    	function removeData(chart) {
+		    //chart.data.labels.pop();
+		    chart.data.datasets.forEach((dataset) => {
+		        dataset.data.shift();
+		    });
+		    chart.update();
+		}
+    	
+    	</script>
+	</body>
+

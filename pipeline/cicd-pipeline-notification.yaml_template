@@ -1,0 +1,141 @@
+# © Copyright IBM Corporation 2023
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: infinite-notification-pipeline
+  namespace: {{NAMESPACE}}
+spec:
+  params:
+    - name: imageTag
+      type: string
+      description: The image tag
+    - name: branch
+      type: string
+      default: main
+      description: The phase of this pipeline, initial, scale, upgrade, etc
+  workspaces:
+    - name: git-source
+  tasks:
+    - name: clone-git-source
+      retries: 0
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: "{{REPO}}"
+        - name: subdirectory
+          value: ""
+        - name: deleteExisting
+          value: "true"
+        - name: revision
+          value: "$(params.branch)"
+      workspaces:
+        - name: output
+          workspace: git-source
+
+    # Deploy ACE Install Integration
+    - name: deploy-ace
+      retries: 0
+      runAfter:
+        - clone-git-source
+      taskRef:
+        name: run-script
+      params:
+        - name: script
+          value: "ace/installNotificationApp.sh"
+        - name: params
+          value: " {{NAMESPACE}}"
+      workspaces:
+        - name: git-source
+          workspace: git-source
+
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: infinite-notification-pipeline-triggertemplate
+  namespace: {{NAMESPACE}}
+spec:
+  params:
+    - name: branch
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: infinite-notification-pipelinerun-$(uid)
+      spec:
+        pipelineRef:
+          name: infinite-notification-pipeline
+        serviceAccountName: pipeline-admin
+        podTemplate:
+          securityContext:
+            runAsUser: 0
+            supplementalGroups:
+              - 65531
+              - 65534
+            fsGroup: 65532
+        workspaces:
+          - name: git-source
+            persistentvolumeclaim:
+              claimName: git-source-workspace3
+        params:
+          - name: imageTag
+            value: $(uid)
+          - name: branch
+            value: $(tt.params.branch)
+        timeout: "20m"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: infinite-notification-pipeline-triggerbinding
+  namespace: {{NAMESPACE}}
+spec:
+  params:
+  - name: branch
+    value: $(body.branch)
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: infinite-notification-pipeline-event-listener
+  namespace: {{NAMESPACE}}
+spec:
+  serviceAccountName: pipeline-admin
+  triggers:
+    - name: infinite-notification-pipeline-trigger
+      bindings:
+        - ref: infinite-notification-pipeline-triggerbinding
+      template:
+        ref: infinite-notification-pipeline-triggertemplate
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: EventListener
+    app.kubernetes.io/part-of: Triggers
+    eventlistener: infinite-notification-pipeline-event-listener
+  name: el-infinite-notification-pipeline-trigger-route
+  namespace: {{NAMESPACE}}
+spec:
+  host: ""
+  port:
+    targetPort: http-listener
+  to:
+    kind: Service
+    name: el-infinite-notification-pipeline-event-listener
+    weight: null

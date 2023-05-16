@@ -1,0 +1,55 @@
+# © Copyright IBM Corporation 2023
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+serverConfVersion: 1
+
+Log:
+  consoleLog: true           # Control writing BIP messages to standard out. Set to true or false, default is true.
+  outputFormat: 'idText'     # Control the format of BIP messages written to standard out and file. Set to idText, text or ibmjson, default is text if unset.
+
+AdminLog:
+  consoleLog: false            # Control writing admin log messages to standard out. Set to true or false, default is false.
+  consoleLogFormat: 'idText'   # Control the format of admin log messages written to standard out. Set to idText, text or ibmjson, default is text if unset.
+
+RestAdminListener:
+  minimumTlsVersion: 'TLSv1.2'   # Set the minimum TLS version that will be accepted from clients. Default is 'TLSv1.0', must be one of 'TLSv1.0', 'TLSv1.1', or 'TLSv1.2'
+  webUserPasswordHashAlgorithm: PBKDF2-SHA-512                        # Algorithm used to hash the password for webuser accounts.
+
+
+Statistics:
+  Snapshot:
+    publicationOn: 'active'      # choose 1 of : active|inactive, explictly set 'active'. If unset will default to 'inactive'
+    nodeDataLevel: 'basic'       # choose 1 of : none|basic|advanced, explictly set 'basic'. If unset will default to 'none'
+    outputFormat: 'json'         # choose comma separated list of one or more of : csv,json,xml,usertrace. Explictly set to 'json' for WebUI. If unset will default to ''
+  Archive:
+  Resource:
+    reportingOn: true            # choose 1 of : true|false, Set to 'true'. If unset will default to 'false'
+
+BrokerRegistry:
+  mqCCDT: '/home/aceuser/generic/ccdt.json'
+  mqKeyRepository: '/home/aceuser/keystores/mq-uc-key-store'
+
+ResourceManagers:
+  GroupDirector:
+    replyFormat: mixed-content          # Controls which method should be used to store messages that are received by a GroupGather node before being output
+
+StartupScripts:
+  ReplaceMQAppName:
+    command: 'export APP_NAME=`echo $HOSTNAME | awk ''{split($0,a,"-"); print a[1]a[4]}'' | tr -d " "` && find /home/aceuser/ace-server/overrides -name "*.policyxml" -exec sed -i "s/\[iib.user-replicaid\]/$APP_NAME/g" {} ";"'
+  EncodedHostScript:
+    command: 'export REPLICA_ID=`echo $HOSTNAME | sha1sum | tr -d "-" | tr -d " "` && echo UserVariables: && /bin/echo -e "  replicaid: \\x27$REPLICA_ID\\x27"'
+    readVariablesFromOutput: true
+
+UserVariables:
+  replicaid: '$REPLICA_ID'

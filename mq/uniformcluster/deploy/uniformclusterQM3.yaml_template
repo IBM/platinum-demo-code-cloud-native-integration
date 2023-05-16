@@ -1,0 +1,67 @@
+# © Copyright IBM Corporation 2023
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: mq.ibm.com/v1beta1
+kind: QueueManager
+metadata:
+  name: ucqm3
+  namespace: $TARGET_NAMESPACE
+spec:
+  version: 9.3.0.0-r1
+  license:
+    accept: true
+    license: L-RJON-CD3JKX
+    use: "NonProduction"
+  pki:
+    keys:
+    - name: default
+      secret:
+        secretName: uniformclustercert
+        items:
+          - tls.key
+          - tls.crt
+  web:
+    enabled: false
+  queueManager:
+    resources:
+      requests:
+        cpu: 1
+      limits:
+        cpu: 2
+    ini:
+      - configMap:
+          name: uniformcluster
+          items:
+            - allqms.ini
+      - configMap:
+          name: uniformclusterqm3
+          items:
+            - qm.ini
+    mqsc:
+      - configMap:
+          name: uniformcluster
+          items:
+            - uniformcluster.mqsc
+    availability:
+      type: NativeHA
+    readinessProbe:
+      periodSeconds: 1
+      failureThreshold: 5
+      timeoutSeconds: 2
+  template:
+    pod:
+      containers:
+        - env:
+            - name: MQSNOAUT
+              value: 'yes'
+          name: qmgr

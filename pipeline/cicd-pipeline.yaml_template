@@ -1,0 +1,207 @@
+# © Copyright IBM Corporation 2023
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: infinite-base-pipeline
+  namespace: {{NAMESPACE}}
+spec:
+  params:
+    - name: imageTag
+      type: string
+      description: The image tag
+    - name: branch
+      type: string
+      default: main
+      description: The phase of this pipeline, initial, scale, upgrade, etc
+  workspaces:
+    - name: git-source
+  tasks:
+    - name: clone-git-source
+      retries: 0
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: "{{REPO}}"
+        - name: subdirectory
+          value: ""
+        - name: deleteExisting
+          value: "true"
+        - name: revision
+          value: "$(params.branch)"
+      workspaces:
+        - name: output
+          workspace: git-source
+
+    # Deploy IBM MQ
+    - name: deploy-mq
+      retries: 0
+      runAfter:
+        - clone-git-source
+      taskRef:
+        name: run-script
+      params:
+        - name: script
+          value: "mq/uniformcluster/deploy.sh"
+        - name: params
+          value: " {{NAMESPACE}} $(params.branch)"
+      workspaces:
+        - name: git-source
+          workspace: git-source
+    
+    # Deploy ACE config
+    - name: deploy-config-ace
+      retries: 0
+      runAfter:
+        - deploy-mq
+      taskRef:
+        name: run-script
+      params:
+        - name: script
+          value: "ace/installACEConfig.sh"
+        - name: params
+          value: " {{NAMESPACE}}"
+      workspaces:
+        - name: git-source
+          workspace: git-source
+
+    # Deploy ACE Install Integration
+    - name: deploy-ace
+      retries: 0
+      runAfter:
+        - deploy-config-ace
+      taskRef:
+        name: run-script
+      params:
+        - name: script
+          value: "ace/installIntegrations.sh"
+        - name: params
+          value: " {{NAMESPACE}}"
+      workspaces:
+        - name: git-source
+          workspace: git-source
+
+    - name: deploy-webui
+      retries: 0
+      runAfter:
+        - deploy-ace
+      taskRef:
+        name: run-script
+      params:
+        - name: script
+          value: "webui/deploy.sh"
+        - name: params
+          value: " {{NAMESPACE}}"
+      workspaces:
+        - name: git-source
+          workspace: git-source
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: run-script
+  namespace: {{NAMESPACE}}
+spec:
+  params:
+    - name: script
+      type: string
+      description: The full path to the script relative to the git workspace
+    - name: params
+      type: string
+      description: The parameters to pass to the script when calling
+  workspaces:
+    - name: git-source
+  steps:
+    - name: oc
+      image: quay.io/openshift/origin-cli:latest
+      script: "/workspace/git-source/$(params.script) $(params.params)"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: infinite-base-pipeline-triggertemplate
+  namespace: {{NAMESPACE}}
+spec:
+  params:
+    - name: branch
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: infinite-base-pipelinerun-$(uid)
+      spec:
+        pipelineRef:
+          name: infinite-base-pipeline
+        serviceAccountName: pipeline-admin
+        podTemplate:
+          securityContext:
+            runAsUser: 0
+            supplementalGroups:
+              - 65531
+              - 65534
+            fsGroup: 65532
+        workspaces:
+          - name: git-source
+            persistentvolumeclaim:
+              claimName: git-source-workspace2
+        params:
+          - name: imageTag
+            value: $(uid)
+          - name: branch
+            value: $(tt.params.branch)
+        timeout: "20m"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: infinite-base-pipeline-triggerbinding
+  namespace: {{NAMESPACE}}
+spec:
+  params:
+  - name: branch
+    value: $(body.branch)
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: infinite-base-pipeline-event-listener
+  namespace: {{NAMESPACE}}
+spec:
+  serviceAccountName: pipeline-admin
+  triggers:
+    - name: infinite-base-pipeline-trigger
+      bindings:
+        - ref: infinite-base-pipeline-triggerbinding
+      template:
+        ref: infinite-base-pipeline-triggertemplate
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: EventListener
+    app.kubernetes.io/part-of: Triggers
+    eventlistener: infinite-base-pipeline-event-listener
+  name: el-infinite-base-pipeline-trigger-route
+  namespace: {{NAMESPACE}}
+spec:
+  host: ""
+  port:
+    targetPort: http-listener
+  to:
+    kind: Service
+    name: el-infinite-base-pipeline-event-listener
+    weight: null

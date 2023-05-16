@@ -1,0 +1,17 @@
+webui/target
+ace/resources/infiniteServerConfig.yaml
+ace/resources/integrationServerPatch.yaml
+ace/resources/policyProject.yaml
+mq/uniformcluster/deploy/uniformclusterQM1.yaml
+mq/uniformcluster/deploy/uniformclusterQM2.yaml
+mq/uniformcluster/deploy/uniformclusterQM3.yaml
+mq/uniformcluster/deploy/uniformclusterQMConfig.yaml
+pipeline/cicd-pipeline-cleanup.yaml
+pipeline/cicd-pipeline-notification.yaml
+pipeline/cicd-pipeline.yaml
+pipeline/cicd-storage.yaml
+setup/ace-operator-subscription.yaml
+setup/mq-operator-subscription.yaml
+setup/operator-group.yaml
+webui/src/main/java/com/ibm/demo/StartTests.java
+webui/deployment.yaml

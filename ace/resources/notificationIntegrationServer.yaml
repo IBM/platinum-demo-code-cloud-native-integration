@@ -1,0 +1,51 @@
+# © Copyright IBM Corporation 2023
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: appconnect.ibm.com/v1beta1
+kind: IntegrationServer
+metadata:
+  name: notification
+spec:
+  adminServerSecure: true
+  createDashboardUsers: true
+  designerFlowsOperationMode: disabled
+  enableMetrics: true
+  license:
+    accept: true
+    license: L-MJTK-WUU8HE
+    use: CloudPakForIntegrationNonProduction
+  pod:
+    containers:
+      runtime:
+        resources:
+          limits:
+            cpu: 1
+            memory: 1024Mi
+          requests:
+            cpu: 1
+            memory: 1024Mi
+  replicas: 1
+  router:
+    timeout: 120s
+  service:
+    endpointType: http
+  version: '12.0'
+  barURL: >-
+    https://raw.githubusercontent.com/IBM/platinum-demo-code-cloud-native-integration/main/ace/bars/NotificationService.bar
+  configurations:
+    - infinite-serverconf
+    - mq-uc-key-store.sth
+    - mq-uc-key-store.kdb
+    - mq-infinite-ccdt
+    - mq-policy-project
+    - cred-for-github

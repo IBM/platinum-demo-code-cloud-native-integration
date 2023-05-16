@@ -1,0 +1,181 @@
+/* © Copyright IBM Corporation 2023
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License. */
+package com.ibm.demo;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Stack;
+import java.util.stream.Collectors;
+
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.SimpleFileServer;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.HttpURLConnection;
+
+public class StartTests extends Thread
+{
+	static ArrayList<RunResults> list = new ArrayList<RunResults>();
+	public static final String BASE_URI = "http://localhost:8080/";
+	public static final String HOSTNAME = "{{HOSTNAME}}";
+	static SummaryOfResults currentSummary = null;
+	public static Stack threadPool = new Stack();
+	
+	public boolean doAPICall=true;
+	public static int callEveryXMills = 20;
+	
+	static
+	{
+		currentSummary = new SummaryOfResults();
+		currentSummary.setRequestsMade(1234);
+		currentSummary.setResponsesReceived(1234);
+		Map<String, Integer> queueManagerRequests = new HashMap<String, Integer>();
+		Map<String, Integer> queueManagerResponse = new HashMap<String, Integer>();
+		Map<String, Integer> integrationServers = new HashMap<String, Integer>();
+		Map<String, Integer> echoServers = new HashMap<String, Integer>();
+		
+		queueManagerRequests.put("qmgr1", Integer.valueOf("500"));
+		queueManagerRequests.put("qmgr2", Integer.valueOf("734"));
+		
+		queueManagerResponse.put("qmgr1", Integer.valueOf("600"));
+		queueManagerResponse.put("qmgr2", Integer.valueOf("634"));
+
+		integrationServers.put("is1", Integer.valueOf("400"));
+		integrationServers.put("is2", Integer.valueOf("834"));
+		
+		echoServers.put("echo1", Integer.valueOf("612"));
+		echoServers.put("echo2", Integer.valueOf("622"));
+		
+		currentSummary.setEchoServers(echoServers);
+		currentSummary.setQueueManagerRequests(queueManagerRequests);
+		currentSummary.setQueueManagerResponse(queueManagerResponse);
+		currentSummary.setIntegrationServers(integrationServers);
+	}
+	
+	
+	public static void main(String[] args) throws InterruptedException, IOException 
+	{
+		final HttpServer server = startServer();
+		System.out.println(String.format("Test Result API started", BASE_URI));
+
+		ManagementThread managementThread = new ManagementThread();
+		managementThread.start();
+
+		NotificationManagementThread notificationManagementThread = new NotificationManagementThread();
+		notificationManagementThread.start();
+
+		MonitorContainerThread containerThread = new MonitorContainerThread();
+		containerThread.start();
+
+		//Pre-load stack with 5 threads for API calls
+		for(int i =0; i<100; i++)
+		{
+			StartTests test = new StartTests();
+			test.doAPICall=true;
+			test.start();
+		}
+
+		Thread.sleep(5000);
+
+		while(true)
+		{
+			StartTests threadForTest = null;
+			boolean makeCall=true;
+			synchronized(threadPool)
+			{
+				if(threadPool.empty())
+				{
+					System.out.println("#########################  sleeping instead ######################");
+					makeCall=false;
+				}
+				else
+				{
+					threadForTest = (StartTests) threadPool.pop();
+				}
+			}
+			if(makeCall)
+			{
+				threadForTest.doAPICall = true;
+				threadForTest.interrupt();
+			}
+			Thread.sleep(callEveryXMills);
+		}
+	}
+
+	public void run()
+	{
+		while(true)
+		{
+			try
+			{
+				//long startTime = System.currentTimeMillis();
+				if(doAPICall)
+				{
+					doAPICall = false;
+					RunResults result = CallAPI.callAPI();
+					synchronized (list) 
+					{
+						list.add(result);
+					}
+					threadPool.push(this);
+					//long endTime = System.currentTimeMillis();
+					//System.out.println("Time for call: " + (endTime-startTime)+ "ms");
+				}
+				try
+				{
+					Thread.sleep(100);
+				}
+				catch (InterruptedException e)
+				{
+					// Thread to wake up. Do nothing
+				}
+				
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+
+		}
+	}
+	
+	   
+    public static HttpServer startServer() throws IOException {
+        
+    	InetSocketAddress socket = new InetSocketAddress(8000);
+    	HttpServer server = HttpServer.create(socket, 0);
+        server.createContext("/rest", new ProcessRESTRequest());
+        String currentPath = new java.io.File(".").getCanonicalPath();
+        System.out.println("Current dir:" + currentPath);
+        server.createContext("/file", SimpleFileServer.createFileHandler(Path.of(currentPath+File.separator+"docs")));
+        server.createContext("/scale-infinite", new InvokePipeline("scaleace"));
+        server.createContext("/scale", new InvokePipeline("scale"));
+		server.createContext("/deploy_new_release", new InvokePipeline("notification"));
+		server.createContext("/upgrade-mq", new InvokePipeline("upgrademq"));
+
+		server.createContext("/scale-mobile-app", new ScaleMobileApp(true));
+		server.createContext("/shrink-mobile-app", new ScaleMobileApp(false));		
+        server.setExecutor(null); // creates a default executor
+        server.start();
+    	return server;
+    }
+
+}
