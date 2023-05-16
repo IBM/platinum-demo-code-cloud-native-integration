@@ -1,35 +1,25 @@
 #!/bin/bash
-#******************************************************************************
-# Licensed Materials - Property of IBM
-# (c) Copyright IBM Corporation 2023. All Rights Reserved.
-#
-# Note to U.S. Government Users Restricted Rights:
-# Use, duplication or disclosure restricted by GSA ADP Schedule
-# Contract with IBM Corp.
-#******************************************************************************
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 namespace=${1:-"cp4i"}
-file_storage=${2:-"ocs-storagecluster-cephfs"}
+hostname=`oc get route console -n openshift-console -o jsonpath='{.spec.host}' | cut -d "." -f2-`
+echo $hostname
 
-#oc new-project $namespace
+cat $SCRIPT_DIR/src/main/java/com/ibm/demo/StartTests.java_template |
+  sed "s#{{HOSTNAME}}#$hostname#g;" > $SCRIPT_DIR/src/main/java/com/ibm/demo/StartTests.java
+
+echo "Deploying to $namespace"
+
+oc new-project $namespace
 oc project $namespace
+oc new-build --name webui --binary --strategy docker
+oc start-build webui --from-dir $SCRIPT_DIR/. --follow
 
-setup/deploy.sh $namespace
+oc create serviceaccount webuisa -n $namespace
+oc create clusterrolebinding webuisa-crb --clusterrole=cluster-admin --serviceaccount=$namespace:webuisa
 
-oc create serviceaccount pipeline-admin -n $namespace
-oc create clusterrolebinding cicd-pipeline-admin-crb --clusterrole=cluster-admin --serviceaccount=$namespace:pipeline-admin
+cat $SCRIPT_DIR/deployment.yaml_template |
+  sed "s#{{NAMESPACE}}#$namespace#g;" > $SCRIPT_DIR/deployment.yaml
 
-oc apply -f pipeline/cicd-environment-setup.yaml
-
-cat pipeline/cicd-storage.yaml_template |
-       sed "s#{{DEFAULT_FILE_STORAGE}}#$file_storage#g;" |
-       sed "s#{{NAMESPACE}}#$namespace#g;" > cicd-storage.yaml
-
-oc apply -f cicd-storage.yaml
-
-sleep 30
-
-URL=$( oc get routes -n $namespace el-environment-setup-pipeline-trigger-route -o jsonpath={.spec.host})
-echo {\"namespace\": \"$namespace\"} >> JSON
-curl -d @JSON http://$URL
-rm JSON
+oc apply -f $SCRIPT_DIR/deployment.yaml -n $namespace
+oc apply -f $SCRIPT_DIR/service.yaml -n $namespace
