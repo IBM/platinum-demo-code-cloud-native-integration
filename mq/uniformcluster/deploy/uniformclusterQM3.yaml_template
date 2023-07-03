@@ -17,10 +17,10 @@ metadata:
   name: ucqm3
   namespace: $TARGET_NAMESPACE
 spec:
-  version: 9.3.0.0-r1
+  version: 9.3.2.0-r1
   license:
     accept: true
-    license: L-RJON-CD3JKX
+    license: L-YBXJ-ADJNSM
     use: "NonProduction"
   pki:
     keys:

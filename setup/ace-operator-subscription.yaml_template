@@ -17,7 +17,7 @@ metadata:
   name: ibm-appconnect
   namespace: {{NAMESPACE}}
 spec:
-  channel: v8.1
+  channel: v8.2
   installPlanApproval: Automatic
   name: ibm-appconnect
   source: ibm-operator-catalog
