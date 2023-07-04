@@ -34,7 +34,7 @@ spec:
           requests:
             cpu: 500m
             memory: 512Mi
-  replicas: 3
+  replicas: 4
   router:
     timeout: 120s
   service:
