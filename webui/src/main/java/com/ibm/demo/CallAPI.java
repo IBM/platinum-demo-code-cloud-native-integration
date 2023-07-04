@@ -44,7 +44,7 @@ public class CallAPI
 				os.write(inputData.getBytes());
 				os.flush();
 				os.close();
-				
+				RunResults result = null;
                 int responseCode = con.getResponseCode();
 				if(responseCode>300)
 				{
@@ -56,7 +56,7 @@ public class CallAPI
 					byte[] dataReceived = new byte[1024];
 					int readBytes = is.read(dataReceived);
 					long endTime = System.currentTimeMillis();
-					RunResults result = RunResults.parseData(Arrays.copyOf(dataReceived, readBytes));
+					result = RunResults.parseData(Arrays.copyOf(dataReceived, readBytes));
 					result.setDuration((endTime-startTime));
 					//System.out.println(Thread.currentThread().getName() + " " + result);
 				}
