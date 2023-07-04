@@ -45,14 +45,21 @@ public class CallAPI
 				os.flush();
 				os.close();
 				
-
-				InputStream is = con.getInputStream();
-				byte[] dataReceived = new byte[1024];
-				int readBytes = is.read(dataReceived);
-				long endTime = System.currentTimeMillis();
-				RunResults result = RunResults.parseData(Arrays.copyOf(dataReceived, readBytes));
-				result.setDuration((endTime-startTime));
-				//System.out.println(Thread.currentThread().getName() + " " + result);
+                int responseCode = con.getResponseCode();
+				if(responseCode>300)
+				{
+					System.out.println("Response code: "+responseCode+" returned after "+ (System.currentTimeMillis()-startTime)+ "ms");
+				}
+				else
+				{
+					InputStream is = con.getInputStream();
+					byte[] dataReceived = new byte[1024];
+					int readBytes = is.read(dataReceived);
+					long endTime = System.currentTimeMillis();
+					RunResults result = RunResults.parseData(Arrays.copyOf(dataReceived, readBytes));
+					result.setDuration((endTime-startTime));
+					//System.out.println(Thread.currentThread().getName() + " " + result);
+				}
 				con.disconnect();
 				return result;
 			} catch (MalformedURLException e) {

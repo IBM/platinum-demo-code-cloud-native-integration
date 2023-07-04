@@ -633,18 +633,18 @@ limitations under the License.
 			var qmgrExistingLabel1 = document.getElementById(label1).textContent;
 			var qmgrName1 = qmgrExistingLabel1.split(" ")[0];
 			var qmgrForLabel1 = listOfServers.find(item => item.name === qmgrName1);
-			console.log("qmgrForLabel1.name="+qmgrForLabel1.name + " qmgrForLabel1.version="+qmgrForLabel1.version)
-		    if(qmgrForLabel1 != null)
+			if(qmgrForLabel1 != null)
 			{
+				console.log("qmgrForLabel1.name="+qmgrForLabel1.name + " qmgrForLabel1.version="+qmgrForLabel1.version)
 				document.getElementById(label1).textContent = qmgrName1 + "     v"+qmgrForLabel1.version;
 			}
 
 			var qmgrExistingLabel2 = document.getElementById(label2).textContent;
 			var qmgrName2 = qmgrExistingLabel2.split(" ")[0];
 			var qmgrForLabel2 = listOfServers.find(item => item.name === qmgrName2);
-			console.log("qmgrForLabel2.name="+qmgrForLabel2.name + " qmgrForLabel2.version="+qmgrForLabel2.version)
 		    if(qmgrForLabel2 != null)
 			{
+				console.log("qmgrForLabel2.name="+qmgrForLabel2.name + " qmgrForLabel2.version="+qmgrForLabel2.version)
 				document.getElementById(label2).textContent = qmgrName2 + "     v"+ qmgrForLabel2.version;
 			}
 
