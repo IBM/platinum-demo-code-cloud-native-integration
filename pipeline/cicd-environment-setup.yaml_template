@@ -35,7 +35,7 @@ spec:
         kind: ClusterTask
       params:
         - name: url
-          value: "https://github.com/callumpjackson/Lab1389.git"
+          value: "https://github.com/callumpjackson/platinum-demo-code-cloud-native-integration.git"
         - name: subdirectory
           value: ""
         - name: deleteExisting
