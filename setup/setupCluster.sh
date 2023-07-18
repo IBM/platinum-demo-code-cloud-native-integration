@@ -21,19 +21,37 @@ kubectl patch storageclass ocs-storagecluster-ceph-rbd -p '{"metadata": {"annota
 $SCRIPT_DIR/installPipelineOnly.sh
 
 #Get currentSecret
-oc get secret -n openshift-config pull-secret -o "jsonpath={.data.\.dockerconfigjson}" | base64 -d > ORIGINAL_SECRETS
-cat ORIGINAL_SECRETS
+#oc get secret -n openshift-config pull-secret -o "jsonpath={.data.\.dockerconfigjson}" | base64 -d > ORIGINAL_SECRETS
+#cat ORIGINAL_SECRETS
 
-COUNT_ICR_SECRETS=$(cat ORIGINAL_SECRETS | jq '.auths."cp.icr.io" | length')
+#COUNT_ICR_SECRETS=$(cat ORIGINAL_SECRETS | jq '.auths."cp.icr.io" | length')
 
-if (( COUNT_ICR_SECRETS == 0 )); then
-  echo "Updating Secret to add IBM Entitlement Key"
+#if (( COUNT_ICR_SECRETS == 0 )); then
+#  echo "Updating Secret to add IBM Entitlement Key"
 
-  UPDATE_SECRET=$(jq '.auths |= . + {"cp.icr.io": {"username": "cp", "password": "'$ENTITLED_REG_KEY'", "auth":"'$ENCODING'", "email": "callumj@uk.ibm.com"}}' ORIGINAL_SECRETS | base64 -w 0) 
+  #UPDATE_SECRET=$(jq '.auths |= . + {"cp.icr.io": {"username": "cp", "password": "'$ENTITLED_REG_KEY'", "auth":"'$ENCODING'", "email": "callumj@uk.ibm.com"}}' ORIGINAL_SECRETS | base64 -w 0) 
 
-  oc patch secret pull-secret -p '{"data": {".dockerconfigjson": "'$UPDATE_SECRET'"}}' -n openshift-config --type=merge
+  #oc patch secret pull-secret -p '{"data": {".dockerconfigjson": "'$UPDATE_SECRET'"}}' -n openshift-config --type=merge
 
-fi
+#fi
 
-rm ORIGINAL_SECRETS
+#rm ORIGINAL_SECRETS
+oc new-project student1
+oc new-project student2
+oc new-project student3
+oc new-project student4
+oc new-project student5
+oc new-project student6
+oc new-project student7
+oc new-project student8
+
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student1
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student2
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student3
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student4
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student5
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student6
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student7
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student8
+
 
