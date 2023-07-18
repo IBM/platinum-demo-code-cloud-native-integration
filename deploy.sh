@@ -12,7 +12,7 @@ namespace=${1:-"cp4i"}
 file_storage=${2:-"ocs-storagecluster-cephfs"}
 
 oc new-project $namespace
-#oc project $namespace
+oc project $namespace
 
 setup/deploy.sh $namespace
 
