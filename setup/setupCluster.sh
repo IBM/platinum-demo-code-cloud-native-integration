@@ -29,7 +29,7 @@ COUNT_ICR_SECRETS=$(cat ORIGINAL_SECRETS | jq '.auths."cp.icr.io" | length')
 if (( COUNT_ICR_SECRETS == 0 )); then
   echo "Updating Secret to add IBM Entitlement Key"
 
-  UPDATE_SECRET=$(jq '.auths |= . + {"cp.icr.io": {"auth":"'$ENCODING'", "email": "callumj@uk.ibm.com"}}' ORIGINAL_SECRETS | base64 -w 0) 
+  UPDATE_SECRET=$(jq '.auths |= . + {"cp.icr.io": {"username": "cp", "password": "'$ENTITLED_REG_KEY'", "auth":"'$ENCODING'", "email": "callumj@uk.ibm.com"}}' ORIGINAL_SECRETS | base64 -w 0) 
 
   oc patch secret pull-secret -p '{"data": {".dockerconfigjson": "'$UPDATE_SECRET'"}}' -n openshift-config --type=merge
 
