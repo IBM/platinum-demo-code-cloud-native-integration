@@ -45,13 +45,13 @@ oc new-project student6
 oc new-project student7
 oc new-project student8
 
-oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student1
-oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student2
-oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student3
-oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student4
-oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student5
-oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student6
-oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student7
-oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY -docker-email=callumj@uk.ibm.com -n student8
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY --docker-email=callumj@uk.ibm.com -n student1
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY --docker-email=callumj@uk.ibm.com -n student2
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY --docker-email=callumj@uk.ibm.com -n student3
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY --docker-email=callumj@uk.ibm.com -n student4
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY --docker-email=callumj@uk.ibm.com -n student5
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY --docker-email=callumj@uk.ibm.com -n student6
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY --docker-email=callumj@uk.ibm.com -n student7
+oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=$ENTITLED_REG_KEY --docker-email=callumj@uk.ibm.com -n student8
 
 
