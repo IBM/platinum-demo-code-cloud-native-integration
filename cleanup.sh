@@ -18,6 +18,12 @@ hostname=$(oc get route el-infinite-cleanup-pipeline-trigger-route -o jsonpath={
 response=$(curl -d "{}" $hostname)
 echo $response
 
+sleep 180s
+
+oc delete pipelineruns --all -n $namespace
+oc delete pipeline --all -n $namespace
+
 oc delete pvc -n $namespace git-source-workspace
 oc delete pvc -n $namespace git-source-workspace2
 oc delete pvc -n $namespace git-source-workspace3
+

@@ -78,12 +78,16 @@ wait_for_operator_start openshift-pipelines-operator openshift-operators
 
 wait_for_pipeline_types 
 
-cat $SCRIPT_DIR/operator-group.yaml_template |
-  sed "s#{{NAMESPACE}}#$namespace#g;" > $SCRIPT_DIR/operator-group$namespace.yaml
+OPERATORGROUPS_INSTALLED=$(oc get operatorgroups -n $namespace --no-headers | wc -l)
+if (( OPERATORGROUPS_INSTALLED == 0 )); then
+  echo "Creating Operator Group for namespace"
+  cat $SCRIPT_DIR/operator-group.yaml_template |
+    sed "s#{{NAMESPACE}}#$namespace#g;" > $SCRIPT_DIR/operator-group$namespace.yaml
 
-oc apply -f $SCRIPT_DIR/operator-group$namespace.yaml
+  oc apply -f $SCRIPT_DIR/operator-group$namespace.yaml
 
-rm $SCRIPT_DIR/operator-group$namespace.yaml
+  rm $SCRIPT_DIR/operator-group$namespace.yaml
+fi
 
 oc apply -f $SCRIPT_DIR/ibm-operator-catalog.yaml
 
