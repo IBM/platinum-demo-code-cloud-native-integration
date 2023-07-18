@@ -16,7 +16,7 @@ oc new-build --name webui --binary --strategy docker
 oc start-build webui --from-dir $SCRIPT_DIR/. --follow
 
 oc create serviceaccount webuisa -n $namespace
-oc create clusterrolebinding webuisa-crb --clusterrole=cluster-admin --serviceaccount=$namespace:webuisa
+oc create clusterrolebinding webuisa-crb-$namespace --clusterrole=cluster-admin --serviceaccount=$namespace:webuisa
 
 cat $SCRIPT_DIR/deployment.yaml_template |
   sed "s#{{NAMESPACE}}#$namespace#g;" > $SCRIPT_DIR/deployment.yaml
