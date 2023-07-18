@@ -78,35 +78,4 @@ wait_for_operator_start openshift-pipelines-operator openshift-operators
 
 wait_for_pipeline_types 
 
-OPERATORGROUPS_INSTALLED=$(oc get operatorgroups -n $namespace --no-headers | wc -l)
-if (( OPERATORGROUPS_INSTALLED == 0 )); then
-  echo "Creating Operator Group for namespace"
-  cat $SCRIPT_DIR/operator-group.yaml_template |
-    sed "s#{{NAMESPACE}}#$namespace#g;" > $SCRIPT_DIR/operator-group$namespace.yaml
-
-  oc apply -f $SCRIPT_DIR/operator-group$namespace.yaml
-
-  rm $SCRIPT_DIR/operator-group$namespace.yaml
-fi
-
-oc apply -f $SCRIPT_DIR/ibm-operator-catalog.yaml
-
-cat $SCRIPT_DIR/mq-operator-subscription.yaml_template |
-  sed "s#{{NAMESPACE}}#$namespace#g;" > $SCRIPT_DIR/mq-operator-subscription$namespace.yaml
-
-oc apply -f $SCRIPT_DIR/mq-operator-subscription$namespace.yaml
-
-rm $SCRIPT_DIR/mq-operator-subscription$namespace.yaml
-
-wait_for_operator_start ibm-mq $namespace
-
-cat $SCRIPT_DIR/ace-operator-subscription.yaml_template |
-  sed "s#{{NAMESPACE}}#$namespace#g;" > $SCRIPT_DIR/ace-operator-subscription$namespace.yaml
-
-oc apply -f $SCRIPT_DIR/ace-operator-subscription$namespace.yaml
-
-rm $SCRIPT_DIR/ace-operator-subscription$namespace.yaml
-
-wait_for_operator_start ibm-appconnect $namespace
-
-echo "Completed installation of MQ and ACE operators successfully"
+echo PIPELINES INSTALLED

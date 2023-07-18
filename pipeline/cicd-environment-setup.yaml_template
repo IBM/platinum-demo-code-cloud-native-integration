@@ -15,6 +15,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: environment-setup-pipeline
+  namespace: {{NAMESPACE}}
 spec:
   params:
     - name: imageTag
@@ -82,6 +83,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: run-script
+  namespace: {{NAMESPACE}}
 spec:
   params:
     - name: script
@@ -101,6 +103,7 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: environment-setup-pipeline-triggertemplate
+  namespace: {{NAMESPACE}}
 spec:
   params:
     - name: namespace
@@ -135,6 +138,7 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: environment-setup-pipeline-triggerbinding
+  namespace: {{NAMESPACE}}
 spec:
   params:
   - name: namespace
@@ -144,6 +148,7 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   name: environment-setup-pipeline-event-listener
+  namespace: {{NAMESPACE}}
 spec:
   serviceAccountName: pipeline-admin
   triggers:
@@ -161,6 +166,7 @@ metadata:
     app.kubernetes.io/part-of: Triggers
     eventlistener: environment-setup-pipeline-event-listener
   name: el-environment-setup-pipeline-trigger-route
+  namespace: {{NAMESPACE}}
 spec:
   host: ""
   port:
