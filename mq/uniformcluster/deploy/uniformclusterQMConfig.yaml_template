@@ -9,6 +9,7 @@ data:
     define ql(APPQ) DEFPSIST(YES)
     define ql(IN) DEFPSIST(YES)
     define ql(OUT) DEFPSIST(YES)
+    alter ql(OUT) STREAMQ(NOTIFICATION) STRMQOS(BESTEF)
     define ql(DLQ)
     define ql(NOTIFICATION) MAXDEPTH(10000) CUSTOM('CAPEXPRY(600)')
     ALTER QMGR DEADQ(DLQ)
