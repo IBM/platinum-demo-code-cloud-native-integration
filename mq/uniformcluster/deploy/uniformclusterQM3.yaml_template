@@ -20,7 +20,7 @@ spec:
   version: 9.3.0.0-r1
   license:
     accept: true
-    license: L-YBXJ-ADJNSM
+    license: L-VTPK-22YZPK
     use: "NonProduction"
   pki:
     keys:

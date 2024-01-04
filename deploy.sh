@@ -10,11 +10,17 @@
 
 namespace=${1:-"cp4i"}
 file_storage=${2:-"ocs-storagecluster-cephfs"}
+BLOCK_STORAGE=${3:-"ocs-storagecluster-ceph-rbd"}
+PATCH_STORAGE=${4:-true}
 
 oc new-project $namespace
 oc project $namespace
 
 setup/deploy.sh $namespace
+
+if [ "$PATCH_STORAGE" = true ] ; then
+  kubectl patch storageclass $BLOCK_STORAGE -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+fi
 
 oc create serviceaccount pipeline-admin -n $namespace
 oc create clusterrolebinding cicd-pipeline-admin-crb-$namespace --clusterrole=cluster-admin --serviceaccount=$namespace:pipeline-admin
