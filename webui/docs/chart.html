@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-© Copyright IBM Corporation 2022
+© Copyright IBM Corporation 2023
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -14,13 +14,7 @@ limitations under the License.
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-	  	<link rel="stylesheet"
-	        href="https://1.www.s81c.com/common/carbon-for-ibm-dotcom/tag/v1/canary/plex.css"/>
-	  	<link rel="stylesheet"
-	        href="https://1.www.s81c.com/common/carbon-for-ibm-dotcom/tag/v1/canary/grid.css"/>
-	 	 <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/modal.min.js"></script>
-	  
-	  	<script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/ui-shell.min.js"></script>
+	  	<link rel="stylesheet" href="css/style.css">
 	
 	  	<style>
 	    h3 {
@@ -30,33 +24,40 @@ limitations under the License.
 		<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     </head>
 	<body>
-		<bx-header aria-label="IBM Platform Name">
-		<bx-header-menu-button button-label-active="Close menu" button-label-inactive="Open menu"></bx-header-menu-button>
-		<bx-header-name href="javascript:void 0" prefix="IBM"> Platinum Demo</bx-header-name>
-		<bx-header-nav menu-bar-label="IBM [Platform]">
-		    <bx-header-nav-item href="javascript:void 0">Monitor</bx-header-nav-item>
-		    <bx-header-nav-item href="javascript:void 0">Control</bx-header-nav-item>
-		</bx-header-nav>
-		</bx-header>
-		<div class="bx--grid">
+		<div class="header" style="vertical-align: middle;">
+			<header>
+				<div class="header-product">
+				<p>IBM &nbsp;<strong style="font-family: 'IBM Plex Sans Semi Bold';">Platinum Demo</strong></p>
+				</div>
+				<div class="header-seperator">
+				</div>
+				<div class="header-buttons">
+					<button class="header-button" id="Monitor">Monitor</button>
+					<button class="header-button" id="Control">Control</button>
+				</div>
+			</header>
+		</div>
+
+
+		<div class="main-body">
 		  <div>
-		    <div style="margin-top:60px;">
-		      <h3>Building and scaling a mission critical cloud native integration</h3>
+		    <div class="title">
+		      Building and scaling a mission critical cloud native integration
 			</div>
 			<div>
 				<hr style="margin: 1rem 0" />
 				<div style="float: left; width: 10%;">
-				<text>Mobile App</text>
+				<text class="subtitle">Mobile App</text>
 				<br>
-				<bx-btn onclick="scaleMobile()" style="margin-top: 8px; width: 100px">
-        			Requests+
-      			</bx-btn>
-      			<bx-btn onclick="shrinkMobile()" style="margin-top: 8px; width: 100px">
-        			Requests-
-      			</bx-btn>
-				<bx-btn onclick="scale()" style="margin-top: 8px; width: 100px">
+				<button onclick="scaleMobile()" style="margin-top: 8px; width: 100px">
+        			Requests +
+				</button>
+      			<button onclick="shrinkMobile()" style="margin-top: 8px; width: 100px">
+        			Requests -
+				</button>
+				<button onclick="scale()" style="margin-top: 8px; width: 100px">
         			Scale
-      			</bx-btn>
+      			</button>
 				</div>
 				<div style="float: left; width: 10%;"></div>
 			    <div style="float: left; width: 90%;margin-bottom: 16px;">
@@ -70,7 +71,7 @@ limitations under the License.
 		    <div>
 			    <hr style="margin: 1rem 0" />
 				<div style="float: left; width: 10%;">
-				<text>ACE</text>
+				<text class="subtitle">ACE</text>
 				<br>
 				<!--bx-btn onclick="scaleCPUInfinite()" style="margin-top: 8px; width: 100px">
         			CPU+
@@ -103,7 +104,7 @@ limitations under the License.
 		    </div>
 		    <div>
 			    <hr style="margin: 1rem 0" />
-				<div style="float: left; width: 10%;">MQ<br>
+				<div style="float: left; width: 10%;" class="subtitle">MQ<br>
 				<!--bx-btn onclick="scaleCPUMQ()" style="margin-top: 8px; width: 100px">
         			CPU+
       			</bx-btn-->
@@ -135,7 +136,7 @@ limitations under the License.
 		    </div>
 		    <div>
 			    <hr style="margin: 1rem 0" />
-				<div style="float: left; width: 10%;">Core Banking
+				<div style="float: left; width: 10%;" class="subtitle">Core Banking
 				<br>
 				<!-- bx-btn onclick="scaleCPUCore()" style="margin-top: 8px; width: 100px">
         			CPU+
@@ -168,11 +169,11 @@ limitations under the License.
 		    </div>
 			<div>
 			    <hr style="margin: 1rem 0" />
-				<div style="float: left; width: 10%;">Notification Service
+				<div style="float: left; width: 10%;" class="subtitle">Notification Service
 				<br>
-				<bx-btn onclick="deployNewRelease()" style="margin-top: 8px; width: 100px">
+				<button onclick="deployNewRelease()" style="margin-top: 8px; width: 100px">
         			Deploy
-      			</bx-btn>
+      			</button>
 				</div>
 				<div style="float: left; width: 90%;margin-bottom: 16px">
 			    	<div style="float: left; width: 25%;">
